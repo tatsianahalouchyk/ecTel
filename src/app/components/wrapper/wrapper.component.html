@@ -1,0 +1,35 @@
+<div class="wrapper">
+  <div  class="wrapper-select">
+    <app-select [config]="config" [data]="selectOptions" [isOptGroups]="isOptGroups" (saveChanges)="onSaveChanges($event)"></app-select>
+  </div>
+
+  <form [formGroup]="reactForm" class="side-bar">
+    <div formGroupName="configForm" class="sub-fg">
+      <mat-form-field appearance="legacy">
+        <mat-label>Set Label</mat-label>
+        <input formControlName="label" matInput>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="multiple">is select multiple</mat-checkbox>
+
+      <mat-checkbox formControlName="disabled">is select disabled</mat-checkbox>
+    </div>
+
+    <div formGroupName="filterForm" class="sub-fg">
+      <p>Filter by color:</p>
+      <mat-checkbox formControlName="red">red</mat-checkbox>
+      <mat-checkbox formControlName="yellow">yellow</mat-checkbox>
+      <mat-checkbox formControlName="green">green</mat-checkbox>
+    </div>
+
+    <div formGroupName="sortForm"  class="sub-fg">
+      <p>Sort by alphabet:</p>
+      <mat-checkbox formControlName="az">A-Z</mat-checkbox>
+      <mat-checkbox formControlName="za">Z-A</mat-checkbox>
+    </div>
+
+    <mat-checkbox formControlName="isColorGroups">Group on Colors</mat-checkbox>
+
+    <p *ngIf="isOptSaved" class="notification">Options Saved !</p>
+  </form>
+</div>

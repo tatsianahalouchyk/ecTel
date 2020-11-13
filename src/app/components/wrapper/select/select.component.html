@@ -1,0 +1,58 @@
+<div class="wrapper">
+  <div class="select-container">
+      <mat-form-field appearance="fill">
+        <mat-label  *ngIf="config && config.label">{{config.label}}</mat-label>
+        <mat-select
+          *ngIf="config && config.multiple; else isNotMultiple"
+          [formControl]="fc"
+          [disabled]="config.disabled"
+          multiple
+        >
+          <div *ngIf="isOptGroups; else isNotGroups">
+              <mat-optgroup *ngFor="let group of data"
+                [label]="group.groupName">
+                <mat-option *ngFor="let options of group.options"
+                  [value]="options.name">
+                  {{options.name}}
+                </mat-option>
+              </mat-optgroup>
+          </div>
+
+        <ng-template #isNotGroups>
+          <mat-option *ngFor="let opt of data"
+            [value]="opt.name">{{opt.name}}</mat-option>
+        </ng-template>
+      </mat-select>
+
+        <ng-template #isNotMultiple>
+          <mat-select
+            [formControl]="fc"
+            [disabled]="config.disabled"
+          >
+            <div *ngIf="isOptGroups; else isNotGroups">
+              <mat-optgroup *ngFor="let group of data"
+                [label]="group.groupName">
+                <mat-option *ngFor="let options of group.options"
+                  [value]="options.name">
+                  {{options.name}}
+                </mat-option>
+              </mat-optgroup>
+            </div>
+
+            <ng-template #isNotGroups>
+              <mat-option *ngFor="let opt of data"
+                [value]="opt.name">{{opt.name}}</mat-option>
+            </ng-template>
+          </mat-select>
+        </ng-template>
+      </mat-form-field>
+
+      <button mat-button
+        type="submit"
+        color="primary"
+        (click)="onSave()">Save changes</button>
+  </div>
+
+
+</div>
+
