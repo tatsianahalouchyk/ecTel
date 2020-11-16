@@ -196,9 +196,9 @@ export class WrapperComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private groupOnColor() {
-    const yellowArr: IData[] = this.filterByColor((this.selectOptions as Array<IData>), Colors.YELLOW);
-    const redArr: IData[] = this.filterByColor((this.selectOptions as Array<IData>), Colors.RED);
-    const greenArr: IData[] = this.filterByColor((this.selectOptions as Array<IData>), Colors.GREEN);
+    const yellowArr: IData[] = this.filterByColor((this.data as Array<IData>), Colors.YELLOW);
+    const redArr: IData[] = this.filterByColor((this.data as Array<IData>), Colors.RED);
+    const greenArr: IData[] = this.filterByColor((this.data as Array<IData>), Colors.GREEN);
 
     this.selectOptions = [
       {
