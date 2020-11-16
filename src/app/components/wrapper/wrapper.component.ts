@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { IConfig, IData, IOptionGroup } from 'src/app/interfaces';
   templateUrl: './wrapper.component.html',
   styleUrls: ['./wrapper.component.scss']
 })
-export class WrapperComponent implements OnInit, OnDestroy {
+export class WrapperComponent implements OnInit, AfterViewInit, OnDestroy {
   form: FormGroup;
 
   config: IConfig;
@@ -125,6 +125,10 @@ export class WrapperComponent implements OnInit, OnDestroy {
         this.setInitOptions();
       }
     });
+  }
+
+  ngAfterViewInit() {
+    this.ngOnInit();
   }
 
   onSaveChanges(ev: string[] | string) {
