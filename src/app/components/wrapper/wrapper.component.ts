@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { IConfig, IData, IOptionGroup } from 'src/app/interfaces';
   templateUrl: './wrapper.component.html',
   styleUrls: ['./wrapper.component.scss']
 })
-export class WrapperComponent implements OnInit {
+export class WrapperComponent implements OnInit, OnDestroy {
   reactForm: FormGroup;
 
   config: IConfig;
@@ -24,20 +24,20 @@ export class WrapperComponent implements OnInit {
     { name: 'Pineapple', color: Colors.YELLOW },
     { name: 'Pear', color: Colors.GREEN },
   ];
-  filterBy: string = '';
-  sortBy: string = SortByParams.NO_PARAMS;
+  filterBy: Colors = Colors.NO_COLOR;
+  sortBy: SortByParams = SortByParams.NO_PARAMS;
   isOptGroups: boolean = false;
 
   selectOptions: IData[] | IOptionGroup[] = [];
 
-  isOptSaved: boolean = false;
+  choosedOptions: string[] = [];
 
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
-    this.addNewReactForm();
+    this.addNewForm();
 
     // set initial options' value:
     this.setInitOptions();
@@ -62,7 +62,7 @@ export class WrapperComponent implements OnInit {
         this.filterBy =
           this.reactForm.get('filterForm').get('yellow').value ?
           Colors.YELLOW : this.reactForm.get('filterForm').get('green').value ?
-          Colors.GREEN : '';
+          Colors.GREEN : Colors.NO_COLOR;
       }
       this.dataFilter(this.filterBy);
     });
@@ -77,7 +77,7 @@ export class WrapperComponent implements OnInit {
         this.filterBy =
           this.reactForm.get('filterForm').get('red').value ?
           Colors.RED : this.reactForm.get('filterForm').get('green').value ?
-          Colors.GREEN : '';
+          Colors.GREEN : Colors.NO_COLOR;
       }
       this.dataFilter(this.filterBy);
     });
@@ -92,7 +92,7 @@ export class WrapperComponent implements OnInit {
         this.filterBy =
           this.reactForm.get('filterForm').get('red').value ?
           Colors.RED : this.reactForm.get('filterForm').get('yellow').value ?
-          Colors.YELLOW : '';
+          Colors.YELLOW : Colors.NO_COLOR;
       }
       this.dataFilter(this.filterBy);
     });
@@ -127,15 +127,26 @@ export class WrapperComponent implements OnInit {
     });
   }
 
-  onSaveChanges(ev: boolean) {
-    this.isOptSaved = ev;
+  onSaveChanges(ev: string[] | string) {
+      if (ev) {
+      if (Array.isArray(ev)) {
+        this.choosedOptions = ev;
+      } else {
+        this.choosedOptions.push(ev);
+      }
+    }
+  }
+
+  public ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 
   private setInitOptions() {
     this.selectOptions = this.data.map(el => el);
   }
 
-  private addNewReactForm() {
+  private addNewForm() {
     this.reactForm = this.fb.group({
       configForm: this.fb.group({
         label: new FormControl('Fruit list'),
@@ -167,24 +178,23 @@ export class WrapperComponent implements OnInit {
       this.resetGroupControl();
   }
 
-  private dataFilter(filterByColor: string) {
-    if (filterByColor === Colors.RED) {
-      this.selectOptions = (this.data as Array<IData>).filter(el => el.color === Colors.RED);
-    } else if (filterByColor === Colors.YELLOW) {
-      this.selectOptions = (this.data as Array<IData>).filter(el => el.color === Colors.YELLOW);
-    } else if (filterByColor === Colors.GREEN) {
-      this.selectOptions = (this.data as Array<IData>).filter(el => el.color === Colors.GREEN);
-    } else {
+  private dataFilter(filterByColor: Colors) {
+    if (filterByColor === Colors.NO_COLOR) {
       this.setInitOptions();
+    } else {
+      this.selectOptions =
+        filterByColor === Colors.RED ? this.setOptionsByColor(this.data, Colors.RED) :
+        filterByColor === Colors.YELLOW ? this.setOptionsByColor(this.data, Colors.YELLOW) :
+        this.setOptionsByColor(this.data, Colors.GREEN);
     }
     this.resetSortForm();
     this.resetGroupControl();
   }
 
   private groupOnColor() {
-    const yellowArr: IData[] = (this.selectOptions as Array<IData>).filter(el => el.color === Colors.YELLOW);
-    const redArr: IData[] = (this.selectOptions as Array<IData>).filter(el => el.color === Colors.RED);
-    const greenArr: IData[] = (this.selectOptions as Array<IData>).filter(el => el.color === Colors.GREEN);
+    const yellowArr: IData[] = this.setOptionsByColor((this.selectOptions as Array<IData>), Colors.YELLOW);
+    const redArr: IData[] = this.setOptionsByColor((this.selectOptions as Array<IData>), Colors.RED);
+    const greenArr: IData[] = this.setOptionsByColor((this.selectOptions as Array<IData>), Colors.GREEN);
 
     this.selectOptions = [
       {
@@ -203,6 +213,10 @@ export class WrapperComponent implements OnInit {
 
     this.resetFilterForm();
     this.resetSortForm();
+  }
+
+    private setOptionsByColor(options: IData[], color: Colors) {
+    return options.filter(el => el.color === color);
   }
 
   private resetFilterForm() {
