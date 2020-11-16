@@ -28,7 +28,9 @@ export class SelectComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.isMultiple = this.config.multiple;
-    this.fc.valueChanges.pipe(takeUntil(this.destroy$)).subscribe();
+    this.fc.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
+      this.saveChanges.emit(v);
+    });
   }
 
   ngOnChanges() {
@@ -37,14 +39,4 @@ export class SelectComponent implements OnInit, OnChanges {
       this.isMultiple = this.config.multiple;
     }
   }
-
-  onSave() {
-    if (this.fc.status === 'VALID') {
-      this.isFormValid = true;
-      this.saveChanges.emit(true);
-    } else {
-      this.isFormValid = false;
-    }
-  }
-
 }
